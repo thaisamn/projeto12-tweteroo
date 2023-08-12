@@ -41,7 +41,10 @@ app.post("/tweets", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
-  const tweetsDeUsuarios = tweets.map((tt) => {
+  const tweetsOrdenados = tweets.sort((a, b) => b.timestamp - a.timestamp);
+  const ultimos10Tweets = tweetsOrdenados.slice(0, 10);
+
+  const tweetsDeUsuarios = ultimos10Tweets.map((tt) => {
     const usuariott = usuarios.find((u) => u.username === tt.username);
     return {
       ...tt,
