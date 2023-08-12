@@ -1,19 +1,12 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 let usuarios = [];
-let usuario = {
-  username: "bobesponja",
-  avatar:
-    "https://cdn.shopify.com/s/files/1/0150/0643/3380/files/Screen_Shot_2019-07-01_at_11.35.42_AM_370x230@2x.png",
-};
-
-let tweet = {
-  username: "bobesponja",
-  tweet: "Eu amo hambúrguer de siri!",
-};
+let tweets = [];
 
 app.get("/", (req, res) => {
   res.send(" Oi Mundo! 4");
@@ -29,17 +22,34 @@ app.post("/sign-up", (req, res) => {
   }
 
   usuarios.push(req.body);
-  usuario = req.body;
 
   return res.status(201).send("OK");
 });
 
 app.post("/tweets", (req, res) => {
-  return res.send("esta funcionando a rota tweets");
+  const usuarioExistente = usuarios.find(
+    (u) => u.username === req.body.username
+  );
+
+  if (!usuarioExistente) {
+    return res.status(401).send("UNAUTHORIZED");
+  }
+
+  tweets.push(req.body);
+
+  return res.status(201).send("OK");
 });
 
 app.get("/tweets", (req, res) => {
-  return res.send("esta funcionando a rota get tweets");
+  const tweetsDeUsuarios = tweets.map((tt) => {
+    const usuariott = usuarios.find((u) => u.username === tt.username);
+    return {
+      ...tt,
+      avatar: usuariott.avatar,
+    };
+  });
+
+  return res.status(200).send(tweetsDeUsuarios);
 });
 
 app.listen(5000, () => console.log("Funcionando com sucesso porta 5000"));
